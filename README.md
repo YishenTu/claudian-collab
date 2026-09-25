@@ -24,6 +24,12 @@ Open the panel using its ribbon icon or **Claudian Collab: Open Collab**. Create
 
 Use **Copy agent API instructions** in settings or the command palette to copy the running loopback HTTP endpoint and operation instructions. The API retains its existing operation catalog and semantics; an agent does not need Claudian chat integration.
 
+## Agent skill
+
+[skill/SKILL.md](skill/SKILL.md) packages the Collab HTTP API instructions previously supplied by Claudian's Collab mode. It covers operation discovery, Project and Ticket references, mutation retries, publishing, updates, and conflicts.
+
+Copy the `skill/` directory into your agent's skills directory as `claudian-collab/`, or give the agent `skill/SKILL.md` directly. With the plugin running in the intended vault, use **Copy agent API instructions** and supply the advertised RPC endpoint to the agent. The skill discovers available operations and parameter contracts from that running instance.
+
 ## Existing users
 
 Update Claudian to a version with embedded Collab removed, or uninstall it, and restart Obsidian before enabling this plugin. An installed embedded implementation blocks startup even when disabled, to prevent accidental simultaneous use.
