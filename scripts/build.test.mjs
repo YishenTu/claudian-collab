@@ -41,6 +41,10 @@ test('release files are self-contained and versions agree', () => {
   assert.equal(versions[manifest.version], manifest.minAppVersion);
   const source = readFileSync('main.js', 'utf8');
   assert.ok(Buffer.byteLength(source) < 5 * 1024 * 1024);
+  assert.match(source, /Third-party notices/);
+  assert.match(source, /Copyright \(c\) 2017 sql\.js authors/);
+  assert.match(source, /Permission is hereby granted/);
+  assert.match(source, /bonjour-service@/);
   assert.deepEqual(timers.findUnsafeTimerUnrefSites(source), []);
   assert.match(readFileSync('styles.css', 'utf8'), /claudian-collab-standalone/);
 });

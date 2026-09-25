@@ -1,4 +1,12 @@
 import js from '@eslint/js';
+import obsidian from 'eslint-plugin-obsidianmd';
+
+// Enforce Obsidian's blocking source rules; optional UI recommendations stay advisory.
+const obsidianRules = Object.fromEntries(obsidian.configs.recommended.flatMap(config =>
+  Object.entries(config.rules ?? {}).filter(([name, value]) =>
+    name.startsWith('obsidianmd/') && name !== 'obsidianmd/rule-custom-message'
+    && (Array.isArray(value) ? value[0] : value) === 'error')));
+
 import tsParser from '@typescript-eslint/parser';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 
@@ -21,5 +29,16 @@ export default [
       'prefer-promise-reject-errors': 'error',
     },
   },
-  { files: ['src/**/*.ts'], rules: { '@typescript-eslint/no-require-imports': 'error' } },
+  {
+    files: ['src/**/*.ts'],
+    plugins: { obsidianmd: obsidian },
+    languageOptions: { parserOptions: { project: './tsconfig.json' } },
+    rules: {
+      ...obsidianRules,
+      '@typescript-eslint/no-require-imports': 'error',
+      'obsidianmd/commands/no-plugin-id-in-command-id': 'error',
+      'obsidianmd/hardcoded-config-path': 'error',
+      'obsidianmd/prefer-get-language': 'error',
+    },
+  },
 ];

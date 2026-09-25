@@ -4,7 +4,11 @@ Collaboration for Obsidian: share projects over LAN or through a Cloud server, t
 
 Works independently of Claudian. Requires Obsidian Desktop 1.13.0 or newer and Git.
 
-## Build and install
+## Installation
+
+Download `main.js`, `manifest.json`, and `styles.css` from a [GitHub release](https://github.com/YishenTu/claudian-collab/releases), or build them from source below. Copy the three files into your vault's `.obsidian/plugins/claudian-collab/` directory, then enable **Claudian Collab** in Settings → Community plugins. If your vault uses a custom configuration directory, replace `.obsidian` with that directory.
+
+### Build from source
 
 Use Node 24.16.0:
 
@@ -14,8 +18,6 @@ cd claudian-collab
 npm ci
 npm run build
 ```
-
-Copy `main.js`, `manifest.json`, and `styles.css` into your vault's `.obsidian/plugins/claudian-collab/` directory, then enable **Claudian Collab** in Settings → Community plugins. If your vault uses a custom configuration directory, replace `.obsidian` with that directory.
 
 ## Using Collab
 
@@ -41,6 +43,14 @@ Your Collab data moves automatically from `.claudian/collab/` to `.claudian-coll
 
 Repeat these steps on each synced device. If migration reports conflicting storage, keep both folders and resolve the conflict before choosing **Retry**. Do not delete the legacy folder to force startup.
 
+## Privacy & data use
+
+- **Shared data and network access:** Project files and Git history, tickets, comments, review changes, member identities, and collaboration events are exchanged with the LAN host or Cloud server selected for that project. LAN hosting uses HTTPS and WebSockets; Bonjour/mDNS advertises the project's identifier, endpoint, and certificate fingerprint on the local network. Cloud projects connect to the server in your invitation or hosting configuration over HTTP(S) and WebSockets. There is no fixed analytics or AI service endpoint.
+- **Background connections:** While enabled, Collab can restore hosted projects, reconnect, receive project events, and recover interrupted operations without another click. Hosting makes a collaboration server available to project members. Disable the plugin to stop its listeners and connections.
+- **Local agent API:** A loopback HTTP server starts at `127.0.0.1` after initialization. Local programs can read and change Collab data through it without a separate API token or confirmation for each operation. It checks request Host and Origin headers, but these do not authenticate local programs. Only give access instructions to agents you trust. Collab does not call AI providers itself; any agent's use of your data follows that agent's configuration and provider policies.
+- **Local storage and file access:** Project workspaces and private state live in your vault, including `.claudian-collab/`. Private state includes Git repositories, databases, device identity, credentials, and keys; the plugin does not encrypt this storage at rest. Your backup or sync software may copy it. Collab also finds and runs a system or user-configured Git executable outside the vault and creates temporary Git probe directories in the operating system's temporary folder. Clipboard writes happen when you copy invitations or agent instructions.
+- **Telemetry, accounts, and payment:** The plugin includes no analytics, telemetry beacons, or ads. It is free and open source; LAN collaboration needs no third-party account. Cloud hosting requires access to a compatible server. Its operator sets any account, payment, retention, logging, and server-side telemetry policies; check those policies before sharing data with that server.
+
 ## License
 
-[MIT](LICENSE).
+[MIT](LICENSE). Third-party license and attribution notices are included in the built `main.js`.

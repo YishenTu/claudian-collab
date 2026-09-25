@@ -1,5 +1,5 @@
 import { isCollabOpaqueId, isCollabProjectId } from '@claudian-collab/protocol';
-import { normalizePath, Notice, Plugin, TFile, TFolder, type WorkspaceLeaf } from 'obsidian';
+import { getLanguage, normalizePath, Notice, Plugin, TFile, TFolder, type WorkspaceLeaf } from 'obsidian';
 import type { LocalAgentRuntimeHttpServer, LocalAgentRuntimeHttpServerEndpoint } from './app/agent-runtime';
 import type { ClaudianCollabService, CollabFeatureService } from './app/collab';
 import type { GitRuntimeResolution } from './app/collab/git/GitRuntimeResolver';
@@ -56,7 +56,7 @@ export default class CollabPlugin extends Plugin {
   private collabDetailViewCoordinator: CollabDetailViewCoordinator | null = null;
 
   onload(): void {
-    setLocale((window.localStorage.getItem('language') || 'en') as Locale);
+    setLocale((getLanguage() || 'en') as Locale);
     this.registerView(COLLAB_VIEW_TYPE, leaf => new CollabView(leaf, {
       ready: () => this.ensureReady(),
       createSurface: (container, viewLeaf) => this.createCollabSurface(container, viewLeaf),
@@ -148,8 +148,8 @@ export default class CollabPlugin extends Plugin {
     this.ready = false;
     this.collabLifecycleGeneration += 1;
     this.collabTransientSurfaces.closeAll();
-    this.app.workspace.detachLeavesOfType(COLLAB_DETAIL_VIEW_TYPE);
-    this.app.workspace.detachLeavesOfType(COLLAB_VIEW_TYPE);
+    // Obsidian retains leaf placement; detail sessions must not survive shutdown.
+    await this.getCollabDetailViewCoordinator().close();
     await this.startup?.catch(() => undefined);
     await this.closeCollabOwners();
     await this.settingsTail;

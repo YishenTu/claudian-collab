@@ -47,3 +47,15 @@ it('fences startup when unloaded during migration', async () => {
   await plugin.onunload();
   await expect(plugin.copyAgentInstructions()).rejects.toThrow(/unloading/);
 });
+it('preserves sidebar placement and clears session-only detail views on unload', async () => {
+  const sidebar = { setViewState: jest.fn(async () => undefined) };
+  const detail = { setViewState: jest.fn(async () => undefined) };
+  jest.mocked(plugin.app.workspace.getLeavesOfType).mockImplementation(type =>
+    (type === 'claudian-collab' ? [sidebar] : [detail]) as never);
+  plugin.onload();
+  await plugin.ensureReady();
+  await plugin.onunload();
+  expect(plugin.app.workspace.detachLeavesOfType).not.toHaveBeenCalled();
+  expect(sidebar.setViewState).not.toHaveBeenCalled();
+  expect(detail.setViewState).toHaveBeenCalledWith({ type: 'empty' });
+});

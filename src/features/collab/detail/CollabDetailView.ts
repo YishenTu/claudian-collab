@@ -475,11 +475,11 @@ export class CollabDetailViewCoordinator {
     if (this.closed) return this.transitionTail;
     this.closed = true;
     this.generation += 1;
-    const detach = (): void => {
-      for (const leaf of this.workspace.getLeavesOfType(COLLAB_DETAIL_VIEW_TYPE)) leaf.detach();
+    const clear = async (): Promise<void> => {
+      await Promise.allSettled(this.workspace.getLeavesOfType(COLLAB_DETAIL_VIEW_TYPE)
+        .map(leaf => leaf.setViewState({ type: 'empty' })));
     };
-    detach();
-    const transition = this.transitionTail.then(detach);
+    const transition = this.transitionTail.then(clear);
     this.transitionTail = transition.catch(() => undefined);
     return transition;
   }

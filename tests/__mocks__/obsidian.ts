@@ -108,6 +108,8 @@ export class Scope {
   });
 }
 
+export const getLanguage = jest.fn(() => 'en');
+
 export const Platform = {
   isMacOS: true,
 };

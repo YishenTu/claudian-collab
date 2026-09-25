@@ -2659,9 +2659,9 @@ describe('CollabDetailView', () => {
 });
 
 describe('CollabDetailViewCoordinator', () => {
-  it('closes the active detail leaf after a completed external action', async () => {
+  it('clears the active detail view without removing its leaf during shutdown', async () => {
     let attached = true;
-    const leaf = { detach: () => { attached = false; } };
+    const leaf = { detach: jest.fn(), setViewState: jest.fn(async () => { attached = false; }) };
     const workspace = {
       getLeaf: jest.fn(),
       getLeavesOfType: () => attached ? [leaf as unknown as WorkspaceLeaf] : [],
@@ -2671,6 +2671,41 @@ describe('CollabDetailViewCoordinator', () => {
     await new CollabDetailViewCoordinator(workspace).close();
 
     expect(attached).toBe(false);
+    expect(leaf.setViewState).toHaveBeenCalledWith({ type: 'empty' });
+    expect(leaf.detach).not.toHaveBeenCalled();
+  });
+
+  it('serializes shutdown after an admitted transition and waits for cleanup', async () => {
+    const opening = deferred<void>();
+    const clearing = deferred<void>();
+    let activeTransitions = 0;
+    let maxActiveTransitions = 0;
+    let closed = false;
+    const leaf = { setViewState: async (state: { type: string }) => {
+      activeTransitions += 1;
+      maxActiveTransitions = Math.max(maxActiveTransitions, activeTransitions);
+      await (state.type === 'empty' ? clearing.promise : opening.promise);
+      activeTransitions -= 1;
+    } };
+    const workspace = {
+      getLeaf: jest.fn(),
+      getLeavesOfType: jest.fn().mockReturnValue([leaf]),
+      revealLeaf: jest.fn().mockResolvedValue(undefined),
+    };
+    const coordinator = new CollabDetailViewCoordinator(workspace);
+    const open = coordinator.open(viewState());
+    await nextTurn();
+    const close = coordinator.close().then(() => { closed = true; });
+    await nextTurn();
+    expect(maxActiveTransitions).toBe(1);
+    opening.resolve();
+    await nextTurn();
+    expect(closed).toBe(false);
+    clearing.resolve();
+    await Promise.all([open, close]);
+    expect(activeTransitions).toBe(0);
+    expect(maxActiveTransitions).toBe(1);
+    expect(workspace.revealLeaf).not.toHaveBeenCalled();
   });
 
   it('reuses the existing detail leaf and persists identifiers without credentials', async () => {

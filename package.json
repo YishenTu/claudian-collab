@@ -16,7 +16,7 @@
     "test:cross-platform": "node scripts/run-cross-platform-collab-tests.js",
     "build": "node esbuild.config.mjs production",
     "dev": "node esbuild.config.mjs",
-    "test:build": "node --test scripts/build.test.mjs",
+    "test:build": "node --test scripts/*.test.mjs",
     "lint": "eslint src tests --max-warnings=0"
   },
   "dependencies": {
