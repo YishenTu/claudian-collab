@@ -7,6 +7,14 @@ import CollabPlugin from '@/main';
 let vault: string;
 let plugin: CollabPlugin;
 let copied = '';
+async function waitForServerClose(endpoint: string): Promise<void> {
+  for (let attempt = 0; attempt < 50; attempt += 1) {
+    try { await fetch(endpoint); }
+    catch { return; }
+    await new Promise(resolve => setTimeout(resolve, 10));
+  }
+  throw new Error('Collab agent API did not close after unload.');
+}
 beforeEach(async () => {
   vault = await mkdtemp(path.join(os.tmpdir(), 'standalone-plugin-'));
   copied = '';
@@ -17,7 +25,21 @@ beforeEach(async () => {
   } as unknown as App;
   plugin = new CollabPlugin(app, { id: 'claudian-collab' } as PluginManifest);
 });
-afterEach(async () => { await plugin.onunload(); await rm(vault, { recursive: true, force: true }); });
+afterEach(async () => {
+  plugin.onunload();
+  const endpoint = copied.match(/RPC endpoint: (\S+)/)?.[1];
+  if (endpoint) await waitForServerClose(endpoint);
+  await rm(vault, { recursive: true, force: true });
+});
+it('returns from the unload hook synchronously', async () => {
+  plugin.onload();
+  await plugin.ensureReady();
+  await plugin.copyAgentInstructions();
+  const endpoint = copied.match(/RPC endpoint: (\S+)/)![1];
+  const result = (plugin.onunload as () => unknown)();
+  expect(result).toBeUndefined();
+  await waitForServerClose(endpoint);
+});
 it('loads without Claudian and serves the existing operation catalog before Git initialization', async () => {
   plugin.onload();
   await plugin.ensureReady();
@@ -27,8 +49,8 @@ it('loads without Claudian and serves the existing operation catalog before Git 
   expect(response.status).toBe(200);
   expect(await response.json()).toMatchObject({ id: 'catalog' });
   expect(await readFile(path.join(vault, '.claudian-collab/settings.json'), 'utf8')).toContain('workspace');
-  await plugin.onunload();
-  await expect(fetch(endpoint)).rejects.toThrow();
+  plugin.onunload();
+  await waitForServerClose(endpoint);
 });
 it('does not publish the API when migration is blocked and can retry after correction', async () => {
   await mkdir(path.join(vault, '.claudian-collab'));
@@ -44,7 +66,7 @@ it('does not publish the API when migration is blocked and can retry after corre
 });
 it('fences startup when unloaded during migration', async () => {
   plugin.onload();
-  await plugin.onunload();
+  plugin.onunload();
   await expect(plugin.copyAgentInstructions()).rejects.toThrow(/unloading/);
 });
 it('preserves sidebar placement and clears session-only detail views on unload', async () => {
@@ -54,7 +76,10 @@ it('preserves sidebar placement and clears session-only detail views on unload',
     (type === 'claudian-collab' ? [sidebar] : [detail]) as never);
   plugin.onload();
   await plugin.ensureReady();
-  await plugin.onunload();
+  plugin.onunload();
+  for (let attempt = 0; attempt < 50 && detail.setViewState.mock.calls.length === 0; attempt += 1) {
+    await new Promise(resolve => setTimeout(resolve, 10));
+  }
   expect(plugin.app.workspace.detachLeavesOfType).not.toHaveBeenCalled();
   expect(sidebar.setViewState).not.toHaveBeenCalled();
   expect(detail.setViewState).toHaveBeenCalledWith({ type: 'empty' });

@@ -39,6 +39,7 @@ export default class CollabPlugin extends Plugin {
   private isUnloading = false;
   private ready = false;
   private startup: Promise<void> | null = null;
+  private unloadTask: Promise<void> | null = null;
   private settingsTail: Promise<void> = Promise.resolve();
   private collabFoundation: ClaudianCollabService | null = null;
   private collabFeatureService: CollabFeatureService | null = null;
@@ -143,11 +144,18 @@ export default class CollabPlugin extends Plugin {
     new Notice('Collab agent API instructions copied.');
   }
 
-  async onunload(): Promise<void> {
+  onunload(): void {
+    if (this.unloadTask) return;
     this.isUnloading = true;
     this.ready = false;
     this.collabLifecycleGeneration += 1;
     this.collabTransientSurfaces.closeAll();
+    this.unloadTask = this.finishUnload().catch(error => {
+      new Notice(error instanceof Error ? error.message : 'Collab cleanup failed.');
+    });
+  }
+
+  private async finishUnload(): Promise<void> {
     // Obsidian retains leaf placement; detail sessions must not survive shutdown.
     await this.getCollabDetailViewCoordinator().close();
     await this.startup?.catch(() => undefined);
