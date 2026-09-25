@@ -32,16 +32,14 @@ First startup moves `.claudian/collab/` into `.claudian-collab/` within the same
 
 The move preserves physical directory identities, credentials, certificates, and recovery records. A completion record prevents repeated import, including after delayed synchronization. Interrupted cutover can resume. Conflicting destination data is preserved and reported for resolution. This includes a destination synced from another device while this device still has legacy storage: startup stops so original local recovery resources are not bypassed. Migration runs before the API, hosting, or recovery starts; the sidebar offers Retry if startup is blocked. Other devices keep their own identities and do not acquire Host ownership from synchronized files.
 
-See the [migration and UI plan](migration/STANDALONE-PLAN.md) for the product decisions. No production vault data was moved during development.
-
 ## Verification
 
 `npm run test:cross-platform` runs the retained native suites on the current OS. `npm run test:lan-compatibility` tests against immutable published Claudian 2.2.6 source, including upgrades through the standalone importer. It needs registry and GitHub access. Cloud-server compatibility scenarios additionally need `CLAUDIAN_AUTHORITY_TRANSFER_SERVER_URL`.
 
 `npm run test:build` checks production assets, compressed locale and SQL Wasm round trips, real SQL initialization, versions, and renderer timer guards. Run it after `npm run build`.
 
-See [extraction validation](migration/VALIDATION.md) and [standalone validation](migration/STANDALONE-VALIDATION.md) for checks and remaining platform coverage.
+[GitHub Actions](https://github.com/YishenTu/claudian-collab/actions) runs the full test suite on Linux, native compatibility tests on macOS and Windows, and production build checks on all three platforms.
 
-## Source provenance
+## Credits
 
-The initial extraction comes from Claudian commit `325202849f15b8f4da9a7de5be0bdf940e5fa76c`. [The extraction inventory](migration/extraction.json) records original paths. Original application wiring and mixed files under `migration/claudian/` are reference material, excluded from compilation. The standalone implementation also incorporates the upstream shared-clock and fixture-date fixes through `4eea89d6`; it retains the extracted filename convention.
+Originally extracted from [Claudian](https://github.com/YishenTu/claudian). Licensed under the [MIT License](LICENSE).

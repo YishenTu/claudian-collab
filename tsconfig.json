@@ -36,7 +36,6 @@
     "tests/**/*.ts"
   ],
   "exclude": [
-    "node_modules",
-    "migration"
+    "node_modules"
   ]
 }
