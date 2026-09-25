@@ -24,6 +24,7 @@ export class PluginSettingTab {
   settingItems: any[] = [];
   containerEl: any = {
     empty: jest.fn(),
+    addClass: jest.fn(),
     createEl: jest.fn().mockReturnValue({ createEl: jest.fn(), createDiv: jest.fn() }),
     createDiv: jest.fn().mockReturnValue({ createEl: jest.fn(), createDiv: jest.fn() }),
   };
