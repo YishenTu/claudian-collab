@@ -1,6 +1,6 @@
 # Claudian Collab
 
-Collaboration for Obsidian: share projects over LAN or through a Cloud server, track tickets, review changes, and publish updates. AI agents can work with your projects through a local HTTP API.
+Collaboration for Obsidian: share projects over LAN or through a Cloud server, track tickets, review changes, and publish updates. AI agents can work with your projects through a local HTTP API. Visit [claudian.md](https://claudian.md/) to learn more.
 
 Works independently of Claudian. Requires Obsidian Desktop 1.13.0 or newer and Git.
 

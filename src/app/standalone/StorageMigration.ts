@@ -181,7 +181,7 @@ export async function migrateCollabStorage(vaultRoot: string, configDirectory: s
         if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error;
         const lock = await readJson(lockPath) as { pid?: number } | null;
         if (!Number.isSafeInteger(lock?.pid) || lock!.pid! <= 0 || processAlive(lock!.pid!)) {
-          throw new Error('Collab migration is already running. Close other Obsidian instances and retry.');
+          throw new Error('Collab migration is already running. Close other Obsidian instances and retry.', { cause: error });
         }
         await unlink(lockPath);
       }
