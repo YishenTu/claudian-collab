@@ -1,6 +1,6 @@
 {
   "name": "claudian-collab",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Collaboration for Obsidian with LAN and Cloud projects, tickets, reviews, and a local agent API",
   "license": "MIT",
