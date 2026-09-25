@@ -1,51 +1,46 @@
 # Claudian Collab
 
-An independent Obsidian Desktop plugin for shared projects, LAN and Cloud collaboration, tickets, reviews, publishing, recovery, and a local HTTP agent API. Claudian is not required.
+Collaboration for Obsidian: share projects over LAN or through a Cloud server, track tickets, review changes, and publish updates. AI agents can work with your projects through a local HTTP API.
 
-The sidebar reuses the former Claudian Collab pane. Its project management dialogs and review/detail tabs retain their existing workflows. Chat references to Collab changes and tickets are not included.
+Works independently of Claudian. Requires Obsidian Desktop 1.13.0 or newer and Git.
 
 ## Build and install
 
-Use Node 24.16.0 and Git. Clone the repository and run:
+Use Node 24.16.0:
 
 ```sh
 git clone https://github.com/YishenTu/claudian-collab.git
 cd claudian-collab
 npm ci
-npm run typecheck
-npm test
 npm run build
-npm run test:build
 ```
 
-Copy `main.js`, `manifest.json`, and `styles.css` into `<vault>/<config-directory>/plugins/claudian-collab/` and enable **Claudian Collab** in Obsidian. The default configuration directory is `.obsidian`. Obsidian 1.13.0 or newer is required. Builds write only into this repository; they do not deploy into a vault or load `.env.local`.
+Copy `main.js`, `manifest.json`, and `styles.css` into your vault's `.obsidian/plugins/claudian-collab/` directory, then enable **Claudian Collab** in Settings → Community plugins. If your vault uses a custom configuration directory, replace `.obsidian` with that directory.
 
-Open the panel using its ribbon icon or **Claudian Collab: Open Collab**. Create, Join, and Resume project setup are also available in the command palette. Configure the Projects folder and optional Git executable in the plugin's settings.
+## Using Collab
 
-Use **Copy agent API instructions** in settings or the command palette to copy the running loopback HTTP endpoint and operation instructions. The API retains its existing operation catalog and semantics; an agent does not need Claudian chat integration.
+Open the sidebar from the ribbon icon or **Claudian Collab: Open Collab** in the command palette. Create a project or join one from an invitation, then use the sidebar to manage tickets, review changes, and publish your work.
+
+Configure the Projects folder and optional Git executable path in the plugin's settings.
 
 ## Agent skill
 
-[skill/SKILL.md](skill/SKILL.md) packages the Collab HTTP API instructions previously supplied by Claudian's Collab mode. It covers operation discovery, Project and Ticket references, mutation retries, publishing, updates, and conflicts.
+The [Collab skill](skill/SKILL.md) teaches agents how to discover API operations, find projects and tickets, publish changes, handle retries, and resolve conflicts.
 
-Copy the `skill/` directory into your agent's skills directory as `claudian-collab/`, or give the agent `skill/SKILL.md` directly. With the plugin running in the intended vault, use **Copy agent API instructions** and supply the advertised RPC endpoint to the agent. The skill discovers available operations and parameter contracts from that running instance.
+Copy `skill/` into your agent's skills directory as `claudian-collab/`, or give the agent `skill/SKILL.md` directly. With Obsidian running in the intended vault, use **Claudian Collab: Copy agent API instructions** and give the copied instructions to the agent. They include the current HTTP endpoint for that vault.
 
 ## Existing users
 
-Update Claudian to a version with embedded Collab removed, or uninstall it, and restart Obsidian before enabling this plugin. An installed embedded implementation blocks startup even when disabled, to prevent accidental simultaneous use.
+If you previously used Collab inside Claudian:
 
-First startup moves `.claudian/collab/` into `.claudian-collab/` within the same vault. It imports the previous Projects-folder and Git settings and adopts this device's existing installation identity into a separate local storage key. Project working copies stay in place. Claudian's other data and its original local identity are left intact.
+1. Back up your vault, including hidden folders, and close other Obsidian instances using it.
+2. Update Claudian to a version without embedded Collab, or uninstall the old version, then restart Obsidian. Disabling the old version alone is insufficient.
+3. Install and enable Claudian Collab in the same vault on the same device.
 
-The move preserves physical directory identities, credentials, certificates, and recovery records. A completion record prevents repeated import, including after delayed synchronization. Interrupted cutover can resume. Conflicting destination data is preserved and reported for resolution. This includes a destination synced from another device while this device still has legacy storage: startup stops so original local recovery resources are not bypassed. Migration runs before the API, hosting, or recovery starts; the sidebar offers Retry if startup is blocked. Other devices keep their own identities and do not acquire Host ownership from synchronized files.
+Your Collab data moves automatically from `.claudian/collab/` to `.claudian-collab/`. Existing projects, settings, and your device identity carry over. Project folders stay in place, and unrelated Claudian data is unchanged. Chat references to Collab changes and tickets are no longer available.
 
-## Verification
+Repeat these steps on each synced device. If migration reports conflicting storage, keep both folders and resolve the conflict before choosing **Retry**. Do not delete the legacy folder to force startup.
 
-`npm run test:cross-platform` runs the retained native suites on the current OS. `npm run test:lan-compatibility` tests against immutable published Claudian 2.2.6 source, including upgrades through the standalone importer. It needs registry and GitHub access. Cloud-server compatibility scenarios additionally need `CLAUDIAN_AUTHORITY_TRANSFER_SERVER_URL`.
+## License
 
-`npm run test:build` checks production assets, compressed locale and SQL Wasm round trips, real SQL initialization, versions, and renderer timer guards. Run it after `npm run build`.
-
-[GitHub Actions](https://github.com/YishenTu/claudian-collab/actions) runs the full test suite on Linux, native compatibility tests on macOS and Windows, and production build checks on all three platforms.
-
-## Credits
-
-Originally extracted from [Claudian](https://github.com/YishenTu/claudian). Licensed under the [MIT License](LICENSE).
+[MIT](LICENSE).
