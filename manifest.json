@@ -1,0 +1,9 @@
+{
+  "id": "claudian-collab",
+  "name": "Claudian Collab",
+  "version": "0.1.0",
+  "minAppVersion": "1.13.0",
+  "description": "Collaborate on shared projects with tickets, reviews, and LAN or Cloud hosting.",
+  "author": "Yishen Tu",
+  "isDesktopOnly": true
+}
