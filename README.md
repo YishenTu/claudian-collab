@@ -6,7 +6,9 @@ Works independently of Claudian. Requires Obsidian Desktop 1.13.0 or newer and G
 
 ## Installation
 
-Download `main.js`, `manifest.json`, and `styles.css` from a [GitHub release](https://github.com/YishenTu/claudian-collab/releases), or build them from source below. Copy the three files into your vault's `.obsidian/plugins/claudian-collab/` directory, then enable **Claudian Collab** in Settings → Community plugins. If your vault uses a custom configuration directory, replace `.obsidian` with that directory.
+Install Claudian Collab from its [community plugin listing](https://community.obsidian.md/plugins/claudian-collab) through Settings → Community plugins.
+
+For manual installation, download `main.js`, `manifest.json`, and `styles.css` from a [GitHub release](https://github.com/YishenTu/claudian-collab/releases), or build them from source below. Copy the three files into your vault's `.obsidian/plugins/claudian-collab/` directory, then enable **Claudian Collab** in Settings → Community plugins. If your vault uses a custom configuration directory, replace `.obsidian` with that directory.
 
 ### Build from source
 
@@ -22,6 +24,8 @@ npm run build
 ## Using Collab
 
 Open the sidebar from the ribbon icon or **Claudian Collab: Open Collab** in the command palette. Create a project or join one from an invitation, then use the sidebar to manage tickets, review changes, and publish your work.
+
+Collab supports LAN and Cloud projects. LAN projects are hosted by a participant's device; Cloud projects use a separate server. To host Cloud projects yourself, see [Claudian Cloud Server](https://github.com/YishenTu/claudian-cloud-server).
 
 Configure the Projects folder and optional Git executable path in the plugin's settings.
 
