@@ -11,6 +11,8 @@ git tag <x.y.z>
 git push origin <x.y.z>
 ```
 
-The Release workflow validates the tag, runs the full parallel CI suite, and downloads the build from that same run. It attests and uploads `main.js`, `manifest.json`, and `styles.css`, then publishes the release with generated notes. It never rebuilds the assets after verification or overwrites an existing release. If publication fails after creating a draft, remove the incomplete draft before rerunning the failed publish job; keep the original tag.
+The Release workflow validates the tag and reuses the retained build from a successful main-branch push CI run for the exact tagged commit. If no such run has usable assets (including when CI is still running or the artifact has expired), it runs the full parallel CI suite and uses that build. Pull request and manual CI runs are not reused for releases.
+
+It validates, attests, and uploads `main.js`, `manifest.json`, and `styles.css`, then publishes the release with generated notes. It never rebuilds the assets after verification or overwrites an existing release. If publication fails after creating a draft, remove the incomplete draft before rerunning the failed publish job; keep the original tag. If a reused artifact expires or is deleted before download, rerun all jobs so the workflow can select another build or run fresh verification.
 
 GitHub releases do not automatically list a new plugin in Obsidian. The initial [Community directory submission](https://docs.obsidian.md/plugins/releasing/submit-plugin) is a separate step after the first release is published. Subsequent releases use the same workflow.

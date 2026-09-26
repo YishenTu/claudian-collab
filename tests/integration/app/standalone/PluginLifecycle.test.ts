@@ -4,6 +4,11 @@ import path from 'node:path';
 import type { App, PluginManifest } from 'obsidian';
 import CollabPlugin from '@/main';
 
+// Keep lifecycle tests independent of the host's occupied or reserved port ranges.
+jest.mock('@/app/agent-runtime/AgentRuntimePortAllocator', () => ({
+  deriveAgentRuntimePortCandidates: () => [0],
+}));
+
 let vault: string;
 let plugin: CollabPlugin;
 let copied = '';
