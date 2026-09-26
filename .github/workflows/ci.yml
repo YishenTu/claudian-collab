@@ -27,11 +27,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .node-version
-          cache: npm
-      - run: npm ci
+      - uses: ./.github/actions/setup
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run build
@@ -58,13 +54,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v4
+      - uses: ./.github/actions/setup
         with:
-          node-version-file: .node-version
-          cache: npm
-      - run: npm ci
-      - run: mkdir -p test-results
-      - run: npm test -- --shard=${{ matrix.shard }}/2 --maxWorkers=2 --json --outputFile=test-results/jest.json
+          test-cache: tests-${{ matrix.shard }}
+      - run: npm test -- --shard=${{ matrix.shard }}/2 --maxWorkers=2 --cacheDirectory=.context/jest-cache --json --outputFile=test-results/jest.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -86,13 +79,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v4
+      - uses: ./.github/actions/setup
         with:
-          node-version-file: .node-version
-          cache: npm
-      - run: npm ci
-      - run: mkdir -p test-results
-      - run: npm run test:cross-platform -- --shard=${{ matrix.shard }}/2 --maxWorkers=2 --json --outputFile=test-results/jest.json
+          test-cache: native-${{ matrix.shard }}
+      - run: npm run test:cross-platform -- --shard=${{ matrix.shard }}/2 --maxWorkers=2 --cacheDirectory=.context/jest-cache --json --outputFile=test-results/jest.json
       - run: npm run build
         if: matrix.shard == 1
       - run: npm run test:build
@@ -113,11 +103,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .node-version
-          cache: npm
-      - run: npm ci
+      - uses: ./.github/actions/setup
       - run: mkdir -p test-results
       - run: npm run test:lan-compatibility -- --json --outputFile=test-results/lan.json
       - uses: actions/upload-artifact@v4
